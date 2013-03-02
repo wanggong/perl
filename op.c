@@ -1276,6 +1276,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_AELEMFAST:
     case OP_AELEMFAST_LEX:
     case OP_ASLICE:
+    case OP_KVASLICE:
     case OP_HELEM:
     case OP_HSLICE:
     case OP_KVHSLICE:
@@ -2077,6 +2078,7 @@ Perl_op_lvalue_flags(pTHX_ OP *o, I32 type, U32 flags)
        PL_modcount = RETURN_UNLIMITED_NUMBER;
 	break;
     case OP_KVHSLICE:
+    case OP_KVASLICE:
 	if (type == OP_LEAVESUBLV)
 	    o->op_private |= OPpMAYBE_LVSUB;
         goto nomod;
@@ -6578,6 +6580,7 @@ S_ref_array_or_hash(pTHX_ OP *cond)
 
     else if(cond
     && (cond->op_type == OP_ASLICE
+    ||  cond->op_type == OP_KVASLICE
     ||  cond->op_type == OP_HSLICE
     ||  cond->op_type == OP_KVHSLICE)) {
 
@@ -8318,6 +8321,9 @@ Perl_ck_delete(pTHX_ OP *o)
 	    /* FALL THROUGH */
 	case OP_HELEM:
 	    break;
+	case OP_KVASLICE:
+	    Perl_croak(aTHX_ "%s argument is index/value array slice, use array slice",
+		  OP_DESC(o));
 	case OP_KVHSLICE:
 	    Perl_croak(aTHX_ "%s argument is key/value hash slice, use hash slice",
 		  OP_DESC(o));

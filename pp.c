@@ -4351,6 +4351,37 @@ PP(pp_aslice)
     RETURN;
 }
 
+PP(pp_kvaslice)
+{
+    dVAR; dSP; dMARK;
+    AV *const av = MUTABLE_AV(POPs);
+    I32 items = SP - MARK;
+
+    bool can_preserve = FALSE;
+
+    MEXTEND(SP,items);
+    while (items > 1) {
+	*(SP+items-1) = *(MARK+items);
+	items--;
+    }
+    items = SP-MARK;
+    SP += items;
+
+    while (++MARK <= SP) {
+	I32 elem = SvIV(*MARK);
+        SV **svp;
+	svp = av_fetch(av, elem, 0);
+	*MARK = sv_2mortal(newSViv(elem));
+	*++MARK = svp ? *svp : &PL_sv_undef;
+    }
+    if (GIMME != G_ARRAY) {
+	MARK = SP - items*2;
+	*++MARK = items > 0 ? *SP : &PL_sv_undef;
+	SP = MARK;
+    }
+    RETURN;
+}
+
 /* Smart dereferencing for keys, values and each */
 PP(pp_rkeys)
 {
