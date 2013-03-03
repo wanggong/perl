@@ -8068,6 +8068,7 @@ Perl_oopsAV(pTHX_ OP *o)
 	return ref(o, OP_RV2AV);
 
     case OP_RV2SV:
+    case OP_RV2HV:
 	o->op_type = OP_RV2AV;
 	o->op_ppaddr = PL_ppaddr[OP_RV2AV];
 	ref(o, OP_RV2AV);
