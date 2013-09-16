@@ -386,6 +386,7 @@ static struct debug_tokens {
     { PLUGEXPR,		TOKENTYPE_OPVAL,	"PLUGEXPR" },
     { PLUGSTMT,		TOKENTYPE_OPVAL,	"PLUGSTMT" },
     { PMFUNC,		TOKENTYPE_OPVAL,	"PMFUNC" },
+    { POSTJOIN,		TOKENTYPE_NONE,		"POSTJOIN" },
     { POSTDEC,		TOKENTYPE_NONE,		"POSTDEC" },
     { POSTINC,		TOKENTYPE_NONE,		"POSTINC" },
     { POWOP,		TOKENTYPE_OPNUM,	"POWOP" },
@@ -2181,11 +2182,18 @@ S_postderef(pTHX_ char const funny, char const next)
     assert(strchr("*[{", next));
     if (next == '*') {
 	PL_expect = XOPERATOR;
+	if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets) {
+	    assert('@' == funny || '$' == funny);
+	    PL_lex_state = LEX_INTERPEND;
+	    start_force(PL_curforce);
+	    force_next(POSTJOIN);
+	}
 	start_force(PL_curforce);
 	force_next(next);
 	PL_bufptr+=2;
     }
     else {
+	if ('@' == funny) PL_lex_dojoin = 2;
 	PL_expect = XOPERATOR;
 	PL_bufptr++;
     }
@@ -2641,7 +2649,7 @@ S_sublex_push(pTHX)
     ENTER;
 
     PL_lex_state = PL_sublex_info.super_state;
-    SAVEBOOL(PL_lex_dojoin);
+    SAVEI8(PL_lex_dojoin);
     SAVEI32(PL_lex_brackets);
     SAVEI32(PL_lex_allbrackets);
     SAVEI32(PL_lex_formbrack);
@@ -3944,6 +3952,7 @@ S_scan_const(pTHX_ char *start)
  * It deals with "$foo[3]" and /$foo[3]/ and /$foo[0123456789$]+/
  *
  * ->[ and ->{ return TRUE
+ * ->$* ->@* ->@[ and ->@{ return TRUE if postfix_interpolate is enabled
  * { and [ outside a pattern are always subscripts, so return TRUE
  * if we're outside a pattern and it's not { or [, then return FALSE
  * if we're in a pattern and the first char is a {
@@ -3968,6 +3977,11 @@ S_intuit_more(pTHX_ char *s)
     if (PL_lex_brackets)
 	return TRUE;
     if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{'))
+	return TRUE;
+    if (*s == '-' && s[1] == '>'
+     && FEATURE_POSTDEREF_QQ_IS_ENABLED
+     && ( (s[2] == '$' && s[3] == '*')
+	||(s[2] == '@' && strchr("*[{",s[3])) ))
 	return TRUE;
     if (*s != '{' && *s != '[')
 	return FALSE;
@@ -5066,6 +5080,7 @@ Perl_yylex(pTHX)
 
     case LEX_INTERPEND:
 	if (PL_lex_dojoin) {
+	    const U8 dojoin_was = PL_lex_dojoin;
 	    PL_lex_dojoin = FALSE;
 	    PL_lex_state = LEX_INTERPCONCAT;
 #ifdef PERL_MAD
@@ -5076,7 +5091,7 @@ Perl_yylex(pTHX)
 	    }
 #endif
 	    PL_lex_allbrackets--;
-	    return REPORT(')');
+	    return REPORT(dojoin_was == 1 ? ')' : POSTJOIN);
 	}
 	if (PL_lex_inwhat == OP_SUBST && PL_linestr == PL_lex_repl
 	    && SvEVALED(PL_lex_repl))
