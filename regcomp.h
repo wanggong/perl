@@ -333,6 +333,10 @@ struct regnode_ssc {
 
 #define ANYOF_INVERT		 0x04
 
+/* For the SSC node only which cannot be inverted, so is shared with that bit.
+ * This means "Does this SSC match an empty string?" */
+#define ANYOF_EMPTY_STRING       ANYOF_INVERT
+
 /* Set if this is a regnode_charclass_posixl vs a regnode_charclass.  This
  * is used for runtime \d, \w, [:posix:], ..., which are used only in locale
  * and the optimizer's synthetic start class.  Non-locale \d, etc are resolved
