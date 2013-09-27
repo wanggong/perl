@@ -90,19 +90,6 @@ Null SV pointer. (No longer available when C<PERL_CORE> is defined.)
 #  endif
 #endif
 
-/* The NeXT dynamic loader headers will not build with the bool macro
-   So declare them now to clear confusion.
-*/
-#if defined(NeXT) || defined(__NeXT__)
-# undef FALSE
-# undef TRUE
-  typedef enum bool { FALSE = 0, TRUE = 1 } bool;
-# define ENUM_BOOL 1
-# ifndef HAS_BOOL
-#  define HAS_BOOL 1
-# endif /* !HAS_BOOL */
-#endif /* NeXT || __NeXT__ */
-
 #ifndef HAS_BOOL
 # if defined(VMS)
 #  define bool int
@@ -1225,87 +1212,65 @@ EXTCONST U32 PL_charclass[];
 #define toUPPER_LATIN1_MOD(c) ((! FITS_IN_8_BITS(c))                       \
                                ? (c)                                       \
                                : PL_mod_latin1_uc[ (U8) (c) ])
-#ifdef USE_NEXT_CTYPE
 
-#  define isALPHANUMERIC_LC(c)	NXIsAlNum((unsigned int)(c))
-#  define isALPHA_LC(c)		NXIsAlpha((unsigned int)(c))
-#  define isASCII_LC(c)		isASCII((unsigned int)(c))
-#  define isBLANK_LC(c)		isBLANK((unsigned int)(c))
-#  define isCNTRL_LC(c)		NXIsCntrl((unsigned int)(c))
-#  define isDIGIT_LC(c)		NXIsDigit((unsigned int)(c))
-#  define isGRAPH_LC(c)		NXIsGraph((unsigned int)(c))
-#  define isIDFIRST_LC(c) (NXIsAlpha((unsigned int)(c)) || (char)(c) == '_')
-#  define isLOWER_LC(c)		NXIsLower((unsigned int)(c))
-#  define isPRINT_LC(c)		NXIsPrint((unsigned int)(c))
-#  define isPUNCT_LC(c)		NXIsPunct((unsigned int)(c))
-#  define isSPACE_LC(c)		NXIsSpace((unsigned int)(c))
-#  define isUPPER_LC(c)		NXIsUpper((unsigned int)(c))
-#  define isWORDCHAR_LC(c) (NXIsAlNum((unsigned int)(c)) || (char)(c) == '_')
-#  define isXDIGIT_LC(c)        NXIsXDigit((unsigned int)(c))
-#  define toLOWER_LC(c)		NXToLower((unsigned int)(c))
-#  define toUPPER_LC(c)		NXToUpper((unsigned int)(c))
-
-#else /* !USE_NEXT_CTYPE */
-
-#  if defined(CTYPE256) || (!defined(isascii) && !defined(HAS_ISASCII))
+#if defined(CTYPE256) || (!defined(isascii) && !defined(HAS_ISASCII))
 
 /* Use foo_LC_uvchr() instead  of these for beyond the Latin1 range */
 
-#    define isALPHA_LC(c)   (FITS_IN_8_BITS(c) && isalpha((unsigned char)(c)))
-#    define isALPHANUMERIC_LC(c)   (FITS_IN_8_BITS(c)                          \
+#  define isALPHA_LC(c)   (FITS_IN_8_BITS(c) && isalpha((unsigned char)(c)))
+#  define isALPHANUMERIC_LC(c)   (FITS_IN_8_BITS(c)                          \
                                                && isalnum((unsigned char)(c)))
-#    ifdef HAS_ISASCII
-#	define isASCII_LC(c) (FITS_IN_8_BITS(c) && isascii((unsigned char)(c)))
-#    else
-#	define isASCII_LC(c) (FITS_IN_8_BITS(c) && isASCII((unsigned char)(c)))
-#    endif
-#    ifdef HAS_ISBLANK
-#	define isBLANK_LC(c) (FITS_IN_8_BITS(c) && isblank((unsigned char)(c)))
-#    else
-#	define isBLANK_LC(c) (FITS_IN_8_BITS(c) && isBLANK((unsigned char)(c)))
-#    endif
-#    define isCNTRL_LC(c)    (FITS_IN_8_BITS(c) && iscntrl((unsigned char)(c)))
-#    define isDIGIT_LC(c)    (FITS_IN_8_BITS(c) && isdigit((unsigned char)(c)))
-#    define isGRAPH_LC(c)    (FITS_IN_8_BITS(c) && isgraph((unsigned char)(c)))
-#    define isIDFIRST_LC(c) (FITS_IN_8_BITS(c)                                 \
-                            && (isalpha((unsigned char)(c)) || (char)(c) == '_'))
-#    define isLOWER_LC(c)    (FITS_IN_8_BITS(c) && islower((unsigned char)(c)))
-#    define isPRINT_LC(c)    (FITS_IN_8_BITS(c) && isprint((unsigned char)(c)))
-#    define isPUNCT_LC(c)    (FITS_IN_8_BITS(c) && ispunct((unsigned char)(c)))
-#    define isSPACE_LC(c)    (FITS_IN_8_BITS(c) && isspace((unsigned char)(c)))
-#    define isUPPER_LC(c)    (FITS_IN_8_BITS(c) && isupper((unsigned char)(c)))
-#    define isWORDCHAR_LC(c) (FITS_IN_8_BITS(c)                                \
-                            && (isalnum((unsigned char)(c)) || (char)(c) == '_'))
-#    define isXDIGIT_LC(c)   (FITS_IN_8_BITS(c) && isxdigit((unsigned char)(c)))
-#    define toLOWER_LC(c) (FITS_IN_8_BITS(c) ? tolower((unsigned char)(c)) : (c))
-#    define toUPPER_LC(c) (FITS_IN_8_BITS(c) ? toupper((unsigned char)(c)) : (c))
-
+#  ifdef HAS_ISASCII
+#    define isASCII_LC(c) (FITS_IN_8_BITS(c) && isascii((unsigned char)(c)))
 #  else
-
-#    define isALPHA_LC(c)	(isascii(c) && isalpha(c))
-#    define isALPHANUMERIC_LC(c) (isascii(c) && isalnum(c))
-#    define isASCII_LC(c)	isascii(c)
-#    ifdef HAS_ISBLANK
-#	define isBLANK_LC(c)	(isascii(c) && isblank(c))
-#    else
-#	define isBLANK_LC(c)	isBLANK_A(c)
-#    endif
-#    define isCNTRL_LC(c)	(isascii(c) && iscntrl(c))
-#    define isDIGIT_LC(c)	(isascii(c) && isdigit(c))
-#    define isGRAPH_LC(c)	(isascii(c) && isgraph(c))
-#    define isIDFIRST_LC(c)	(isascii(c) && (isalpha(c) || (c) == '_'))
-#    define isLOWER_LC(c)	(isascii(c) && islower(c))
-#    define isPRINT_LC(c)	(isascii(c) && isprint(c))
-#    define isPUNCT_LC(c)	(isascii(c) && ispunct(c))
-#    define isSPACE_LC(c)	(isascii(c) && isspace(c))
-#    define isUPPER_LC(c)	(isascii(c) && isupper(c))
-#    define isWORDCHAR_LC(c)	(isascii(c) && (isalnum(c) || (c) == '_'))
-#    define isXDIGIT_LC(c)      (isascii(c) && isxdigit(c))
-#    define toLOWER_LC(c)	(isascii(c) ? tolower(c) : (c))
-#    define toUPPER_LC(c)	(isascii(c) ? toupper(c) : (c))
-
+#    define isASCII_LC(c) (FITS_IN_8_BITS(c) && isASCII((unsigned char)(c)))
 #  endif
-#endif /* USE_NEXT_CTYPE */
+#  ifdef HAS_ISBLANK
+#    define isBLANK_LC(c) (FITS_IN_8_BITS(c) && isblank((unsigned char)(c)))
+#  else
+#    define isBLANK_LC(c) (FITS_IN_8_BITS(c) && isBLANK((unsigned char)(c)))
+#  endif
+#  define isCNTRL_LC(c)    (FITS_IN_8_BITS(c) && iscntrl((unsigned char)(c)))
+#  define isDIGIT_LC(c)    (FITS_IN_8_BITS(c) && isdigit((unsigned char)(c)))
+#  define isGRAPH_LC(c)    (FITS_IN_8_BITS(c) && isgraph((unsigned char)(c)))
+#  define isIDFIRST_LC(c) (FITS_IN_8_BITS(c)                                 \
+                            && (isalpha((unsigned char)(c)) || (char)(c) == '_'))
+#  define isLOWER_LC(c)    (FITS_IN_8_BITS(c) && islower((unsigned char)(c)))
+#  define isPRINT_LC(c)    (FITS_IN_8_BITS(c) && isprint((unsigned char)(c)))
+#  define isPUNCT_LC(c)    (FITS_IN_8_BITS(c) && ispunct((unsigned char)(c)))
+#  define isSPACE_LC(c)    (FITS_IN_8_BITS(c) && isspace((unsigned char)(c)))
+#  define isUPPER_LC(c)    (FITS_IN_8_BITS(c) && isupper((unsigned char)(c)))
+#  define isWORDCHAR_LC(c) (FITS_IN_8_BITS(c)                                \
+                            && (isalnum((unsigned char)(c)) || (char)(c) == '_'))
+#  define isXDIGIT_LC(c)   (FITS_IN_8_BITS(c) && isxdigit((unsigned char)(c)))
+#  define toLOWER_LC(c) (FITS_IN_8_BITS(c) ? tolower((unsigned char)(c)) : (c))
+#  define toUPPER_LC(c) (FITS_IN_8_BITS(c) ? toupper((unsigned char)(c)) : (c))
+
+#else
+
+#  define isALPHA_LC(c)	(isascii(c) && isalpha(c))
+#  define isALPHANUMERIC_LC(c) (isascii(c) && isalnum(c))
+#  define isASCII_LC(c)	isascii(c)
+#  ifdef HAS_ISBLANK
+#    define isBLANK_LC(c)	(isascii(c) && isblank(c))
+#  else
+#    define isBLANK_LC(c)	isBLANK_A(c)
+#  endif
+#  define isCNTRL_LC(c)	(isascii(c) && iscntrl(c))
+#  define isDIGIT_LC(c)	(isascii(c) && isdigit(c))
+#  define isGRAPH_LC(c)	(isascii(c) && isgraph(c))
+#  define isIDFIRST_LC(c)	(isascii(c) && (isalpha(c) || (c) == '_'))
+#  define isLOWER_LC(c)	(isascii(c) && islower(c))
+#  define isPRINT_LC(c)	(isascii(c) && isprint(c))
+#  define isPUNCT_LC(c)	(isascii(c) && ispunct(c))
+#  define isSPACE_LC(c)	(isascii(c) && isspace(c))
+#  define isUPPER_LC(c)	(isascii(c) && isupper(c))
+#  define isWORDCHAR_LC(c)	(isascii(c) && (isalnum(c) || (c) == '_'))
+#  define isXDIGIT_LC(c)      (isascii(c) && isxdigit(c))
+#  define toLOWER_LC(c)	(isascii(c) ? tolower(c) : (c))
+#  define toUPPER_LC(c)	(isascii(c) ? toupper(c) : (c))
+
+#endif
 
 #define isIDCONT(c)             isWORDCHAR(c)
 #define isIDCONT_A(c)           isWORDCHAR_A(c)

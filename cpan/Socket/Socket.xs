@@ -22,10 +22,6 @@
 #ifdef I_SYS_UN
 #  include <sys/un.h>
 #endif
-/* XXX Configure test for <netinet/in_systm.h needed XXX */
-#if defined(NeXT) || defined(__NeXT__)
-#  include <netinet/in_systm.h>
-#endif
 #if defined(__sgi) && !defined(AF_LINK) && defined(PF_LINK) && PF_LINK == AF_LNK
 #  undef PF_LINK
 #endif

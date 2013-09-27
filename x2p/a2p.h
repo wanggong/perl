@@ -45,17 +45,7 @@
 #  include <sys/types.h>
 #endif
 
-#ifdef USE_NEXT_CTYPE
-
-#if NX_CURRENT_COMPILER_RELEASE >= 400
-#include <objc/NXCType.h>
-#else /*  NX_CURRENT_COMPILER_RELEASE < 400 */
-#include <appkit/NXCType.h>
-#endif /*  NX_CURRENT_COMPILER_RELEASE >= 400 */
-
-#else /* !USE_NEXT_CTYPE */
 #include <ctype.h>
-#endif /* USE_NEXT_CTYPE */
 
 #define MEM_SIZE Size_t
 #ifdef PERL_MEM_LOG

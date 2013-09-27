@@ -413,7 +413,6 @@ cpan/CPAN/t/10version.t		See if CPAN the module works
 cpan/CPAN/t/11mirroredby.t		See if CPAN::Mirrored::By works
 cpan/DB_File/Changes		Berkeley DB extension change log
 cpan/DB_File/config.in		Part of Berkeley DB configuration
-cpan/DB_File/DB_File_BS		Berkeley DB extension mkbootstrap fodder
 cpan/DB_File/DB_File.pm		Berkeley DB extension Perl module
 cpan/DB_File/DB_File.xs		Berkeley DB extension external subroutines
 cpan/DB_File/dbinfo		Berkeley DB database version checker
@@ -1388,7 +1387,6 @@ cpan/IPC-Cmd/t/src/output.pl	IPC::Cmd tests
 cpan/IPC-Cmd/t/src/x.tgz	IPC::Cmd tests
 cpan/IPC-SysV/Changes			IPC::SysV changes
 cpan/IPC-SysV/hints/cygwin.pl		Hint for IPC::SysV for named architecture
-cpan/IPC-SysV/hints/next_3.pl		Hint for IPC::SysV for named architecture
 cpan/IPC-SysV/lib/IPC/Msg.pm		IPC::SysV extension Perl module
 cpan/IPC-SysV/lib/IPC/Semaphore.pm	IPC::SysV extension Perl module
 cpan/IPC-SysV/lib/IPC/SharedMem.pm	IPC::SysV extension Perl module
@@ -3652,7 +3650,6 @@ ext/DynaLoader/dl_dllload.xs	S/390 dllload() style implementation
 ext/DynaLoader/dl_dlopen.xs	BSD/SunOS4&5 dlopen() style implementation
 ext/DynaLoader/dl_dyld.xs	NeXT/Apple dyld implementation
 ext/DynaLoader/dl_hpux.xs	HP-UX implementation
-ext/DynaLoader/dl_next.xs	NeXT implementation
 ext/DynaLoader/dl_none.xs	Stub implementation
 ext/DynaLoader/dl_symbian.xs	Symbian implementation
 ext/DynaLoader/dlutils.c	Dynamic loader utilities for dl_*.xs files
@@ -3844,7 +3841,6 @@ ext/POSIX/hints/gnuknetbsd.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/linux.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/mint.pl		Hint for POSIX for named architecture
 ext/POSIX/hints/netbsd.pl	Hint for POSIX for named architecture
-ext/POSIX/hints/next_3.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/openbsd.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/sunos_4.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/svr4.pl		Hint for POSIX for named architecture
@@ -4115,9 +4111,6 @@ hints/mpc.sh			Hints for named architecture
 hints/ncr_tower.sh		Hints for named architecture
 hints/netbsd.sh			Hints for named architecture
 hints/newsos4.sh		Hints for named architecture
-hints/next_3_0.sh		Hints for named architecture
-hints/next_3.sh			Hints for named architecture
-hints/next_4.sh			Hints for named architecture
 hints/nonstopux.sh		Hints for named architecture
 hints/openbsd.sh		Hints for named architecture
 hints/opus.sh			Hints for named architecture
